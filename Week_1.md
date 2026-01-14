@@ -1,6 +1,6 @@
 ```python #必须在开头规定语言才能有对应的高亮
 import pandas as pd
-import os   #import是每次开新文档都要重新写的
+import os   #import是每次开文档都要重新写的
 #os查看文件、路径等等，标准库
 
 print('Hello')
