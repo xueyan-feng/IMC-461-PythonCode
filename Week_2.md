@@ -12,89 +12,62 @@ len(employee_payroll.loc[employee_payroll['Employee_Gender'] == 'M'])
 #2. SUM: to calculate the sum of all the instances in a column
 employee_payroll.Salary.sum()
 
-employee_payroll.Salary.mean()
-
-
 #3. MAX: maximum value of an attribute
-
-sqldf("SELECT MAX(Salary)
-FROM employee_payroll
-      WHERE [Employee_Gender] = 'M'")
+employee_payroll.loc[employee_payroll['Employee_Gender'] == 'M', 'Salary'].max()
+#可以把Salary也放进loc[]，会更简洁，仅需加上引号，不用再加[]
 
 #4. MIN: minimum value of an attribute
-#Syntax:
-#sqldf("select min(<column name>) from <table name>")
-
-#Example:
-sqldf("SELECT MIN(Salary)
-FROM employee_payroll
-      WHERE [Employee_Gender] = 'F'")
+employee_payroll.loc[employee_payroll['Employee_Gender'] == 'F', 'Salary'].min()
 
 #5. AVERAGE: to calculate the average of all the instances in a column
-#Syntax:
-#sqldf("select avg(<column name>) from <table name>")
+employee_payroll.Salary.mean()
 
-#Example:
-sqldf("SELECT AVG(Salary)
-FROM employee_payroll")
+employee_payroll.Salary.sum() / len(employee_payroll)
 
-sqldf("SELECT SUM(Salary) / COUNT(*)
-FROM employee_payroll")
 
 # BIG BANG THEORY Exercise
 
 # DOWNLOAD THE FILE "bigbangtheory.xlsx" FROM CANVAS
 # CONVERT TO A CSV FILE
 # LOAD INTO AN R DATAFRAME
-bigbang <- read.csv("bigbangtheory.csv", header=TRUE)
-str(bigbang)
-head(bigbang)
+bigbang = pd.read_csv('/Users/eloisefeng/Desktop/NU/Data Management/bigbangtheory.csv')
+bigbang.info()
+bigbang.head(5)
 
 #1. How many characters are in the cast?  How many female characters?
+len(bigbang)
 
-
-## example of "pure" SQL code
-sqldf("SELECT COUNT(*) AS CastSize
-FROM bigbang")
+len(bigbang.loc[bigbang.gender == 'Female'])
 
 
 #2. What are the occupations of characters?
-sqldf("SELECT DISTINCT job AS Occup
-FROM bigbang")
+bigbang.job.unique()
 
 
 #3. What is the average IQ of the cast?
-sqldf("SELECT AVG(IQ) AS AvgIQ
-FROM bigbang")
+bigbang.IQ.mean()
 
 
 #4. What is the mean IQ of the males?
-sqldf("SELECT AVG(IQ) AS AvgIQ
-FROM bigbang
-      WHERE gender = 'Male'")
-
+bigbang.loc[bigbang.gender == 'Male', 'IQ'].mean()
 
 
 #5. What is the mean IQ of the biologists?
+bigbang.loc[bigbang.job.isin(['Neurobiologist', 'Microbiologist']), 'IQ'].mean()
 
-## THESE THREE APPROACHES WILL PRODUCE THE SAME RESULT
-sqldf("SELECT AVG(IQ) AS AvgIQ
-FROM bigbang
-      WHERE job = 'Neurobiologist' or job = 'Microbiologist'")
+bigbang.loc[bigbang.job.str.contains('Neurobiologist|Microbiologist', case=False), 'IQ'].mean()
+#注意str.contains()里只有一对引号，所有内容都要写在同一对引号内
 
-
-sqldf("SELECT AVG(IQ) AS AvgIQ
-FROM bigbang
-      WHERE job like 'Neurobiologist' or 'Microbiologist'")
-
+bigbang.loc[bigbang.job.str.contains('biologist', case=False), 'IQ'].mean()
+#法2和法3中的case=False都代表不管大小写
 
 
 #GROUP BY example
 
 ## USING THE BIGBANGTHEORY DATA, DISPLAY THE MEAN IQ BY GENDER, AND JOB
-sqldf("SELECT gender, AVG(IQ) AS AvgIQ
-FROM bigbang
-      GROUP BY gender")
+bigbang.groupby('gender')['IQ'].mean().reset_index(name='AvgIQ')
+#注意groupby()要放在前面（与sql相反）
+#注意reset_index(name='AvgIQ')，给所得列加上列名
 
 
 #HAVING example
@@ -151,43 +124,6 @@ WHEN INSTR(LOWER(job), 'biologist') THEN 10
 ELSE 5 END AS Jokes
 FROM bigbang")
 
-
-
-### SPOILER ALERT!!!  ANSWER CODE BELOW! 
-###  TRY TO WRITE YOUR CODE BEFORE PEEKING!
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-sqldf("SELECT DISTINCT job FROM bigbang")
-
-# > sqldf("SELECT DISTINCT job FROM bigbang")
-# job
-# 1      Physicist
-# 2 Neurobiologist
-# 3 Astrophysicist
-# 4 Microbiologist
-# 5       Engineer
-# 6      Sales Rep
 
 
 sqldf("SELECT name, job,
