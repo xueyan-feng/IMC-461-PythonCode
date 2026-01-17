@@ -4,32 +4,19 @@ import os
 employee_payroll = pd.read_csv('/Users/eloisefeng/Desktop/NU/Data Management/Employee_Payroll2.csv')
 
 #1. COUNT: to count all the rows in the table
+len(employee_payroll)
 
-#Example: 
-sqldf("SELECT COUNT(*)
-FROM employee_payroll")
+len(employee_payroll.loc[employee_payroll['Employee_Gender'] == 'M'])
 
-sqldf("SELECT COUNT(*)
-FROM employee_payroll
-      WHERE [Employee_Gender] = 'M'")
 
 #2. SUM: to calculate the sum of all the instances in a column
-#Syntax:
-#sqldf("select sum(<column name>) from <table name>")
+employee_payroll.Salary.sum()
 
-#Example:
-sqldf("SELECT SUM(Salary)
-FROM employee_payroll")
-
-## alt average calc 
-
+employee_payroll.Salary.mean()
 
 
 #3. MAX: maximum value of an attribute
-#Syntax:
-#sqldf("select max(<column name>) from <table name>")
 
-#Example:
 sqldf("SELECT MAX(Salary)
 FROM employee_payroll
       WHERE [Employee_Gender] = 'M'")
