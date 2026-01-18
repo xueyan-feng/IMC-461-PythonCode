@@ -67,20 +67,18 @@ bigbang.loc[bigbang.job.str.contains('biologist', case=False), 'IQ'].mean()
 ## USING THE BIGBANGTHEORY DATA, DISPLAY THE MEAN IQ BY GENDER, AND JOB
 bigbang.groupby('gender')['IQ'].mean().reset_index(name='AvgIQ')
 #注意groupby()要放在前面（与sql相反）
-#注意reset_index(name='AvgIQ')，给所得列加上列名
+#reset_index(name='AvgIQ')给所得列加上列名
 
 
 #HAVING example
 
-
-
 ## USING THE BIGBANGTHEORY DATA, DISPLAY THE MEAN IQ FOR THE OCCUPATIONS WITH AN IQ GREAT THAN 170 
-sqldf("SELECT job, AVG(IQ) AS AvgIQ
-FROM bigbang
-      GROUP BY job
-      HAVING IQ > 170")
+bigbang.groupby('job')['IQ'].mean().reset_index(name='AvgIQ').query('AvgIQ > 170')
+#此处可以用query()表示the colomn in current table
 
-
+grouped_bigbang = bigbang.groupby('job')['IQ'].mean().reset_index(name='AvgIQ')
+grouped_bigbang.loc[grouped_bigbang['AvgIQ'] > 170]
+#不能直接在后面加loc[]，因为loc[]会从原表里找叫'AvgIQ'的这一列，然而找不到，所以会报错
 
 
 #CASE and INSTR -- POWERPOINT
@@ -95,11 +93,10 @@ FROM bigbang
 #Level IV employees receive a 12% bonus.
 #All others receive an 8% bonus.
 #The Staff table contains all of the information that you need to create this report.
-staff <- read.csv("Staff.csv", header=TRUE)
-head(staff)
+staff = pd.read_csv('/Users/eloisefeng/Desktop/NU/Data Management/Staff.csv')
+staff.head(5)
 
-sqldf("SELECT DISTINCT Job_Title
-      FROM staff")
+staff['Job_Title'].unique()
 
 
 sqldf("SELECT Job_Title, Salary, 
