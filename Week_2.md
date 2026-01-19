@@ -99,13 +99,33 @@ staff.head(5)
 staff['Job_Title'].unique()
 
 
-sqldf("SELECT Job_Title, Salary, 
-CASE WHEN INSTR(Job_Title, 'IV') > 5 THEN Salary * 0.12
-WHEN INSTR(Job_Title, 'III') > 5 THEN Salary * 0.1
-WHEN INSTR(Job_Title, 'II') > 5 THEN Salary * 0.07
-WHEN INSTR(Job_Title, 'I') > 5 THEN Salary * 0.05
-ELSE Salary * 0.08 END AS Bonus
-      FROM staff")
+def bonus_rate(Job_Title):
+    if Job_Title.endswith(' I'): return 0.05  #此处不要直接运算bonus，因为如果在这里写staff['Salary'] * 0.05会把整列所有人的工资都*0.05，而不是当前这一个人的
+    elif Job_Title.endswith(' II'): return 0.07
+    elif Job_Title.endswith(' III'): return 0.1
+    elif Job_Title.endswith(' IV'): return 0.12
+    else: return 0.08   # return后面不能有逗号，否则会当成（数值，）返回，而不是纯数字
+rates = staff['Job_Title'].apply(bonus_rate)   #用apply()调用函数
+staff['Bonus'] = staff['Salary'] * rates
+staff[['Job_Title', 'Salary', 'Bonus']]  #简化此处，无需使用loc[]
+
+#or
+
+import numpy as np
+conditions = [
+    staff['Job_Title'].str.endswith(' I'),  #此处不可以使用loc[]，因为loc[]是筛选出所有符合条件的行，并把这些行（连同所有列）打包成一个新的表格返回
+    staff['Job_Title'].str.endswith(' II'),  #可以在endswith里加上na=False，防止null报错
+    staff['Job_Title'].str.endswith(' III'),
+    staff['Job_Title'].str.endswith(' IV')
+]
+values = [
+    staff['Salary'] * 0.05, 
+    staff['Salary'] * 0.07, 
+    staff['Salary'] * 0.1, 
+    staff['Salary'] * 0.12
+]
+staff['Bonus'] = np.select(conditions, values, default= staff['Salary'] * 0.08)
+staff[['Job_Title', 'Salary', 'Bonus']]
 
 
 #CASE statement works as: as long as the data pass the test, it stops without looking at the rest rows
